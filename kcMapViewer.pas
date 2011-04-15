@@ -599,13 +599,13 @@ begin
 
     if FUseThreads then
     begin
-      //FPool.CriticalSection.Enter;
+      FPool.CriticalSection.Enter;
       FBitmap.BeginUpdate(True);
       try
         FBitmap.Canvas.Draw(XB, YB, image);
       finally
         FBitmap.EndUpdate;
-        //FPool.CriticalSection.Leave;
+        FPool.CriticalSection.Leave;
       end;
     end
     else
