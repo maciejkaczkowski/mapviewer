@@ -36,8 +36,8 @@ type
     FProxyPort: Integer;
     FProxyUsername: string;
     FUseProxy: Boolean;
-  public
-    procedure DownloadFile(const Url: string; str: TStream); override;
+  protected
+    procedure DoDownloadFile(const Url: string; str: TStream); override;
   published
     property UseProxy: Boolean read FUseProxy write FUseProxy;
     property ProxyHost: string read FProxyHost write FProxyHost;
@@ -50,7 +50,7 @@ implementation
 
 { TMVDESynapse }
 
-procedure TMVDESynapse.DownloadFile(const Url: string; str: TStream);
+procedure TMVDESynapse.DoDownloadFile(const Url: string; str: TStream);
 var
   FHttp: THTTPSend;
 begin

@@ -52,10 +52,23 @@ type
 
   { TCustomDownloadEngine }
 
+  TOnBeforeDownloadEvent = procedure(Url: string; str: TStream; var CanHandle: Boolean) of object;
+  TOnAfterDownloadEvent = procedure(Url: string; str: TStream) of object;
+
   TCustomDownloadEngine = class(TComponent)
+  private
+    FOnAfterDownload: TOnAfterDownloadEvent;
+    FOnBeforeDownload: TOnBeforeDownloadEvent;
+  protected
+    procedure DoDownloadFile(const Url: string; str: TStream); virtual;
   public
     constructor Create(AOwner: TComponent); override;
     procedure DownloadFile(const Url: string; str: TStream); virtual;
+  published
+    property OnBeforeDownload: TOnBeforeDownloadEvent read FOnBeforeDownload
+      write FOnBeforeDownload;
+    property OnAfterDownload: TOnAfterDownloadEvent read FOnAfterDownload
+      write FOnAfterDownload;
   end;
 
   { TMapViewer }
@@ -70,6 +83,8 @@ type
     FMouseDown: Boolean;
     FUseThreads: Boolean;
 
+    FUpdating: Boolean;
+
     FX: Int64;
     FY: Int64;
     FOffsetX: Int64;
@@ -78,7 +93,6 @@ type
     FMaxY: Int64;
 
     FBitmap: TBitmap;
-    //FCacheBitmap: TBitmap;
 
     FOldArea: TArea;
     FVisibleArea: TArea;
@@ -118,6 +132,9 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+
+    procedure BeginUpdate;
+    procedure EndUpdate;
 
     function GetMouseMapTile(X, Y: Integer): TIntPoint;
     function GetMouseMapPixel(X, Y: Integer): TIntPoint;
@@ -250,14 +267,33 @@ end;
 
 { TCustomDownloadEngine }
 
+procedure TCustomDownloadEngine.DoDownloadFile(const Url: string; str: TStream
+  );
+begin
+
+end;
+
 constructor TCustomDownloadEngine.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 end;
 
 procedure TCustomDownloadEngine.DownloadFile(const Url: string; str: TStream);
+var
+  ACanHandle: Boolean;
 begin
+  if Assigned(FOnBeforeDownload) then
+    FOnBeforeDownload(Url, str, ACanHandle)
+  else
+    ACanHandle := False;
 
+  if not ACanHandle then
+    DoDownloadFile(Url, str);
+
+  if Assigned(FOnAfterDownload) then
+    FOnAfterDownload(Url, str);
+
+  str.Position := 0;
 end;
 
 { TTileJob }
@@ -403,7 +439,6 @@ begin
 
   FPool := TThreadPool.Create;
   FBitmap := TBitmap.Create;
-  //FCacheBitmap := TBitmap.Create;
 
   FCache := TStringList.Create;
   FSource := msGoogleNormal;
@@ -419,11 +454,21 @@ destructor TMapViewer.Destroy;
 begin
   FPool.Terminate;
   ClearCache;
-  //FCacheBitmap.Free;
   FBitmap.Free;
   FCache.Free;
   FPool.Free;
   inherited;
+end;
+
+procedure TMapViewer.BeginUpdate;
+begin
+  FUpdating := True;
+end;
+
+procedure TMapViewer.EndUpdate;
+begin
+  FUpdating := False;
+  RepaintMap(False);
 end;
 
 function TMapViewer.GetMouseMapTile(X, Y: Integer): TIntPoint;
@@ -833,6 +878,9 @@ var
   job: TTileJob;
   FCacheBitmap: TBitmap;
 begin
+  if FUpdating then
+    Exit;
+
   AX := X - FOffsetX;
   AY := Y - FOffsetY;
 

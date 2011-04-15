@@ -32,10 +32,11 @@ type
   TMVDEWin32 = class(TCustomDownloadEngine)
   private
     FNetHandle: Pointer;
+  protected
+    procedure DoDownloadFile(const Url: string; str: TStream); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure DownloadFile(const Url: string; str: TStream); override;
   end;
 
 
@@ -54,7 +55,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TMVDEWin32.DownloadFile(const Url: string; str: TStream);
+procedure TMVDEWin32.DoDownloadFile(const Url: string; str: TStream);
 var
   UrlHandle: HINTERNET;
   Buffer: array[0..8192] of Char;
