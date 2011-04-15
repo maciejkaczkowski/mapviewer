@@ -74,7 +74,6 @@ type
     function GetJobCount(Index: string): Integer;
     function GetJobExists(Index: string): Boolean;
     function GetJobsCount: Integer;
-    procedure SetRunning(const AValue: Boolean);
     function GetRunningThreads: Integer;
   public
     class procedure Init;
@@ -84,7 +83,7 @@ type
     procedure Add(AJob: TJob); overload;
     procedure Execute;
     procedure Terminate;
-    property Running: Boolean read FRunning write SetRunning;
+    property Running: Boolean read FRunning write FRunning;
     property CriticalSection: TCriticalSection read FCS;
     property JobCount[Index: string]: Integer read GetJobCount;
     property JobExists[Index: string]: Boolean read GetJobExists;
@@ -95,6 +94,9 @@ var
   ThreadPool: TThreadPool;
 
 implementation
+
+const
+  SLEEP_TIME = 30;
 
 { TJob }
 
@@ -178,30 +180,16 @@ begin
   Result := FList.Count;
 end;
 
-procedure TThreadPool.SetRunning(const AValue: Boolean);
-var
-  i: Integer;
-begin
-  FRunning := AValue;
-  {$ifndef unix}
-  for i := 0 to FPool.Count - 1 do
-  begin
-    if AValue then
-      TCustomThread(FPool.Objects[i]).Resume
-    else
-      TCustomThread(FPool.Objects[i]).Suspend;
-  end;
-  {$endif unix}
-end;
-
 function TThreadPool.GetRunningThreads: Integer;
 var
   i: Integer;
 begin
+  FCS.Enter;
   Result := 0;
   for i := 0 to FPool.Count - 1 do
     if TCustomThread(FPool.Objects[i]).Running then
-      Inc(Result)
+      Inc(Result);
+  FCS.Leave;
 end;
 
 class procedure TThreadPool.Init;
@@ -283,13 +271,22 @@ begin
 end;
 
 procedure TThreadPool.Execute;
+var
+  i: Integer;
 begin
   Running := True;
   try
     while (FList.Count > 0) do
-      Sleep(10);
+      Sleep(SLEEP_TIME);
+
+    i := 0;
     while GetRunningThreads > 0 do
-      Sleep(10);
+    begin
+      Sleep(SLEEP_TIME);
+      Inc(i);
+      if i = 500 then
+        Break;
+    end;
   finally
     Running := False;
   end;
@@ -316,24 +313,20 @@ begin
       j := FOwner.GetJob;
       if Assigned(j) then
       begin
-        FOwner.FCS.Enter;
         FJobName := j.Name;
         FRunning := True;
-        FOwner.FCS.Leave;
         try
           j.Execute;
         finally
-          FOwner.FCS.Enter;
           FJobName := '';
           FRunning := False;
-          FOwner.FCS.Leave;
+          j.Free;
         end;
-        j.Free;
       end
       else
         FRunning := False;
     end;
-    Sleep(10);
+    Sleep(SLEEP_TIME);
   end;
 end;
 
