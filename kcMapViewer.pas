@@ -29,7 +29,8 @@ type
   TMapSource = (msNone, msGoogleNormal, msGoogleSatellite, msGoogleHybrid,
     msGooglePhysical, msGooglePhysicalHybrid, msOpenStreetMapMapnik,
     msOpenStreetMapOsmarender, msOpenCycleMap, msVirtualEarthBing,
-    msVirtualEarthRoad, msVirtualEarthAerial, msVirtualEarthHybrid);
+    msVirtualEarthRoad, msVirtualEarthAerial, msVirtualEarthHybrid,
+    msYahooNormal, msYahooSatellite, msYahooHybrid);
 
   { TArea }
 
@@ -644,6 +645,11 @@ procedure TMapViewer.DownloadTile(X, Y, Z: Integer; Graphic: TBitmap);
         end;
   end;
 
+  function YahooY(Y: Integer): Integer;
+  begin
+    Result := - (Y - IntPower(Z) div 2) - 1;
+  end;
+
 var
   stream: TMemoryStream;
   img: TGraphic;
@@ -690,8 +696,20 @@ begin
           url.Add(Format('http://a%d.ortho.tiles.virtualearth.net/tiles/a%s.jpg?g=72&shading=hill', [Random(4), QuadKey(X, Y, Z)]));
         msVirtualEarthHybrid:
           url.Add(Format('http://h%d.ortho.tiles.virtualearth.net/tiles/h%s.jpg?g=72&shading=hill', [Random(4), QuadKey(X, Y, Z)]));
+        msYahooNormal:
+          url.Add(Format('http://maps%d.yimg.com/hx/tl?b=1&v=4.3&.intl=en&x=%d&y=%d&z=%d&r=1', [Random(3)+1, X, YahooY(Y), Z+1]));
+        msYahooSatellite:
+          url.Add(Format('http://maps%d.yimg.com/ae/ximg?v=1.9&t=a&s=256&.intl=en&x=%d&y=%d&z=%d&r=1', [Random(3)+1, X, YahooY(Y), Z+1]));
+        msYahooHybrid:
+          begin
+            url.Add(Format('http://maps%d.yimg.com/ae/ximg?v=1.9&t=a&s=256&.intl=en&x=%d&y=%d&z=%d&r=1', [Random(3)+1, X, YahooY(Y), Z+1]));
+            url.Add(Format('http://maps%d.yimg.com/hx/tl?b=1&v=4.3&t=h&.intl=en&x=%d&y=%d&z=%d&r=1', [Random(3)+1, X, YahooY(Y), Z+1]));
+          end;
       end;
       {$endregion}
+
+      if (X = 0) and (Y = 0) and (Z = 0) and (FSource in [msYahooHybrid, msYahooSatellite]) then
+        url.Clear;
 
       Graphic.Height := TILE_SIZE;
       Graphic.Width := TILE_SIZE;
@@ -722,7 +740,7 @@ begin
           begin
             Inc(ValidCount);
             Graphic.Canvas.Brush.Style := bsClear;
-            if (img is TPortableNetworkGraphic) and (FSource in [msGoogleHybrid, msGooglePhysicalHybrid]) then
+            if (img is TPortableNetworkGraphic) and (FSource in [msGoogleHybrid, msGooglePhysicalHybrid, msYahooHybrid]) then
             begin // fix bug when drawing completly transparent png
               if CalcPixels(TPortableNetworkGraphic(img)) > 0 then
                 Graphic.Canvas.Draw(0, 0, img);
