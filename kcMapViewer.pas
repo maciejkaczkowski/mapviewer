@@ -443,6 +443,9 @@ begin
   FCache := TStringList.Create;
   FSource := msGoogleNormal;
 
+  Height := TILE_SIZE;
+  Width := TILE_SIZE;
+
   FCacheSize := 100;
   FX := 0;
   FY := 0;
