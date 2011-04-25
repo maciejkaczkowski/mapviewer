@@ -26,6 +26,7 @@ uses
   SysUtils, Classes, Controls, Graphics, kcThreadPool;
 
 type
+  TMapViewer = class;
   TMapSource = (msNone, msGoogleNormal, msGoogleSatellite, msGoogleHybrid,
     msGooglePhysical, msGooglePhysicalHybrid, msOpenStreetMapMapnik,
     msOpenStreetMapOsmarender, msOpenCycleMap, msVirtualEarthBing,
@@ -71,6 +72,16 @@ type
       write FOnAfterDownload;
   end;
 
+  { TCustomGeolocationEngine }
+
+  TCustomGeolocationEngine = class(TComponent)
+  protected
+    FDownloadEngine: TCustomDownloadEngine;
+    function DoSearch: TRealPoint; virtual;
+  public
+    procedure Search(AParent: TMapViewer);
+  end;
+
   { TMapViewer }
 
   TMapViewer = class(TCustomControl)
@@ -80,6 +91,7 @@ type
     FCacheSize: Word;
     FDoubleBuffering: Boolean;
     FDownloadEngine: TCustomDownloadEngine;
+    FGeolocationEngine: TCustomGeolocationEngine;
     FMouseDown: Boolean;
     FUseThreads: Boolean;
 
@@ -139,6 +151,8 @@ type
     function GetMouseMapTile(X, Y: Integer): TIntPoint;
     function GetMouseMapPixel(X, Y: Integer): TIntPoint;
     function GetMouseMapLongLat(X, Y: Integer): TRealPoint;
+
+    procedure Geolocate;
     procedure Center;
 
     property CenterLongLat: TRealPoint read GetCenterLongLat write SetCenterLongLat;
@@ -151,6 +165,7 @@ type
     property CacheSize: Word read FCacheSize write SetCacheSize default 100;
     property UseThreads: Boolean read FUseThreads write FUseThreads;
     property DownloadEngine: TCustomDownloadEngine read FDownloadEngine write SetDownloadEngine;
+    property GeolocationEngine: TCustomGeolocationEngine read FGeolocationEngine write FGeolocationEngine;
     property DoubleBuffering: Boolean read FDoubleBuffering write FDoubleBuffering;
     property Align;
     property OnMouseDown;
@@ -263,6 +278,25 @@ begin
   end
   else
     Result := False;
+end;
+
+{ TCustomGeolocationEngine }
+
+function TCustomGeolocationEngine.DoSearch: TRealPoint;
+begin
+  Result.X := 0;
+  Result.Y := 0;
+end;
+
+procedure TCustomGeolocationEngine.Search(AParent: TMapViewer);
+var
+  r: TRealPoint;
+begin
+  FDownloadEngine := AParent.DownloadEngine;
+  r := DoSearch;
+  AParent.BeginUpdate;
+  AParent.CenterLongLat := r;
+  AParent.EndUpdate;
 end;
 
 { TCustomDownloadEngine }
@@ -550,6 +584,12 @@ begin
   else
   if Result.X < MIN_LONGITUDE then
     Result.X := MIN_LONGITUDE;
+end;
+
+procedure TMapViewer.Geolocate;
+begin
+  if Assigned(FGeolocationEngine) then
+    FGeolocationEngine.Search(Self);
 end;
 
 procedure TMapViewer.Center;

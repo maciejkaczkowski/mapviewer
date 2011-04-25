@@ -7,13 +7,13 @@ procedure Register;
 implementation
 
 uses
-  Classes, LResources, kcMapViewer
+  Classes, LResources, kcMapViewer, kcMapViewerGLGeoNames
   {$IFDEF ENABLE_SYNAPSE}, kcMapViewerDESynapse{$ENDIF ENABLE_SYNAPSE}
   {$IFDEF WIN32}, kcMapViewerDEWin32{$ENDIF WIN32};
 
 procedure Register;
 begin
-  RegisterComponents('Misc',[TMapViewer
+  RegisterComponents('Misc',[TMapViewer, TMVGLGeoNames
   {$IFDEF ENABLE_SYNAPSE}, TMVDESynapse{$ENDIF ENABLE_SYNAPSE}
   {$IFDEF WIN32}, TMVDEWin32{$ENDIF WIN32}]);
   LazarusResources.Add('TMapViewer','PNG',[
@@ -32,6 +32,17 @@ begin
     +#150#142#131#230#255#139#147#171#148#22#1'9'#30'='#178#151#203#223'~'#255#165
     +#165#5#228't'#28#188'{'#215#238'.T'#25#12#128'8'#200'A'#5#0#141#193#170'R'
     +#227'S'#151#245#0#0#0#0'IEND'#174'B`'#130
+  ]);
+  LazarusResources.Add('TMVGLGeoNames','PNG',[
+    #137'PNG'#13#10#26#10#0#0#0#13'IHDR'#0#0#0#24#0#0#0#24#4#3#0#0#0#18'Y '#203#0
+    +#0#0'0PLTE'#224#229#255#30#134#252#0#0#0#188#254#164#253#0#0#0#25#255#0#0#0#0
+    +#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#129#162'Y'#150#0#0#0#9
+    +'pHYs'#0#0#11#18#0#0#11#18#1#210#221'~'#252#0#0#0'fIDAT'#24#211#141#144#219#9
+    +#192' '#12'E'#175#161#11#132#210#255#16#186'@'#232#10'.'#208#253#151#169#137
+    +'h'#21','#244#248'ub^'#138#155';'#7'x'#0#140#128#20'hB"'#218'E'#252#172#132
+    +#176'eP'#19'='#179#234#234#230#187#193'<g'#218' '#248'/^*'#132#20#239#145#18
+    +#211'"'#198'VDcH'#186'v'#23#170'if'#246#214'DZ'#195'e'#252#170#7#247'T'#14'&'
+    +'z'#180#213'C'#0#0#0#0'IEND'#174'B`'#130
   ]);
   {$IFDEF ENABLE_SYNAPSE}
   LazarusResources.Add('TMVDESynapse','PNG',[
