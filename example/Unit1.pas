@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, StdCtrls, ComCtrls, kcMapViewer
+  Dialogs, ExtCtrls, StdCtrls, ComCtrls, kcMapViewer, kcMapViewerGLGeoNames
   {$IFDEF WIN32}, kcMapViewerDEWin32{$ELSE}, kcMapViewerDESynapse{$ENDIF WIN32};
 
 type
@@ -12,10 +12,12 @@ type
   { TForm1 }
 
   TForm1 = class(TForm)
+    Button2: TButton;
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
     ComboBox1: TComboBox;
+    Edit1: TEdit;
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
     GroupBox3: TGroupBox;
@@ -27,8 +29,10 @@ type
     Label6: TLabel;
     Label7: TLabel;
     mv: TMapViewer;
+    MVGLGeoNames1: TMVGLGeoNames;
     Panel1: TPanel;
     TrackBar1: TTrackBar;
+    procedure Button2Click(Sender: TObject);
     procedure CheckBox1Change(Sender: TObject);
     procedure CheckBox2Change(Sender: TObject);
     procedure CheckBox3Change(Sender: TObject);
@@ -167,6 +171,16 @@ end;
 procedure TForm1.CheckBox1Change(Sender: TObject);
 begin
   mv.Debug := CheckBox1.Checked;
+end;
+
+procedure TForm1.Button2Click(Sender: TObject);
+begin
+  mv.BeginUpdate;
+  MVGLGeoNames1.LocationName := Edit1.Text;
+  mv.Zoom := 12;
+  TrackBar1.Position := mv.Zoom;
+  mv.Geolocate;
+  mv.EndUpdate;
 end;
 
 procedure TForm1.CheckBox2Change(Sender: TObject);

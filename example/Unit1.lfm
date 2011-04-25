@@ -24,6 +24,7 @@ object Form1: TForm1
     Zoom = 0
     Debug = True
     UseThreads = False
+    GeolocationEngine = MVGLGeoNames1
     DoubleBuffering = False
     Align = alClient
     OnMouseMove = FormMouseMove
@@ -88,7 +89,7 @@ object Form1: TForm1
       TabOrder = 1
     end
     object TrackBar1: TTrackBar
-      Left = 8
+      Left = 9
       Height = 40
       Top = 56
       Width = 148
@@ -194,5 +195,26 @@ object Form1: TForm1
       OnChange = CheckBox3Change
       TabOrder = 7
     end
+    object Button2: TButton
+      Left = 188
+      Height = 21
+      Top = 348
+      Width = 75
+      Caption = 'Search'
+      OnClick = Button2Click
+      TabOrder = 8
+    end
+    object Edit1: TEdit
+      Left = 8
+      Height = 21
+      Top = 348
+      Width = 160
+      TabOrder = 9
+      Text = 'New York'
+    end
+  end
+  object MVGLGeoNames1: TMVGLGeoNames
+    left = 664
+    top = 408
   end
 end
