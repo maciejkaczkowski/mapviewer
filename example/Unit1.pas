@@ -40,7 +40,6 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
-    procedure FormShow(Sender: TObject);
     procedure FormDblClick(Sender: TObject);
     procedure TrackBar1Change(Sender: TObject);
   private
@@ -76,19 +75,6 @@ begin
   r := mv.CenterLongLat;
   Label6.Caption := Format('Long: %g', [r.X]);
   Label7.Caption := Format('Lat: %g', [r.Y]);
-end;
-
-procedure TForm1.FormShow(Sender: TObject);
-begin
-{  mv := TMapViewer.Create(Self);
-  mv.Parent := Self;
-  mv.Align := alClient;
-  mv.Source := msNone;
-  mv.Debug := True;
-  mv.Zoom := 0;
-  mv.Center;
-  mv.OnMouseMove := @FormMouseMove;
-  mv.OnDblClick := @FormDblClick;}
 end;
 
 procedure TForm1.FormDblClick(Sender: TObject);
