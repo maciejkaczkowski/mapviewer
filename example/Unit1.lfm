@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 202
+  Left = 214
   Height = 537
-  Top = 196
+  Top = 176
   Width = 893
   Caption = 'Form1'
   ClientHeight = 537
@@ -62,6 +62,10 @@ object Form1: TForm1
         'Yahoo - Normal'
         'Yahoo - Satellite'
         'Yahoo - Hybrid'
+        'Ovi - Normal'
+        'Ovi - Satellite'
+        'Ovi - Hybrid'
+        'Ovi - Physical'
       )
       OnChange = ComboBox1Change
       Style = csDropDownList
