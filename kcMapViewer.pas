@@ -31,7 +31,8 @@ type
     msGooglePhysical, msGooglePhysicalHybrid, msOpenStreetMapMapnik,
     msOpenStreetMapOsmarender, msOpenCycleMap, msVirtualEarthBing,
     msVirtualEarthRoad, msVirtualEarthAerial, msVirtualEarthHybrid,
-    msYahooNormal, msYahooSatellite, msYahooHybrid);
+    msYahooNormal, msYahooSatellite, msYahooHybrid,
+    msOviNormal, msOviSatellite, msOviHybrid, msOviPhysical);
 
   { TArea }
 
@@ -793,6 +794,14 @@ begin
             url.Add(Format('http://maps%d.yimg.com/ae/ximg?v=1.9&t=a&s=256&.intl=en&x=%d&y=%d&z=%d&r=1', [Random(3)+1, X, YahooY(Y), Z+1]));
             url.Add(Format('http://maps%d.yimg.com/hx/tl?b=1&v=4.3&t=h&.intl=en&x=%d&y=%d&z=%d&r=1', [Random(3)+1, X, YahooY(Y), Z+1]));
           end;
+        msOviNormal:
+          url.Add(Format('http://%s.maptile.maps.svc.ovi.com/maptiler/v2/maptile/newest/normal.day/%d/%d/%d/256/png8', [Char(Ord('a')+Random(5)), Z, X, Y]));
+        msOviSatellite:
+          url.Add(Format('http://%s.maptile.maps.svc.ovi.com/maptiler/v2/maptile/newest/satellite.day/%d/%d/%d/256/png8', [Char(Ord('a')+Random(5)), Z, X, Y]));
+        msOviHybrid:
+          url.Add(Format('http://%s.maptile.maps.svc.ovi.com/maptiler/v2/maptile/newest/hybrid.day/%d/%d/%d/256/png8', [Char(Ord('a')+Random(5)), Z, X, Y]));
+        msOviPhysical:
+          url.Add(Format('http://%s.maptile.maps.svc.ovi.com/maptiler/v2/maptile/newest/terrain.day/%d/%d/%d/256/png8', [Char(Ord('a')+Random(5)), Z, X, Y]));
       end;
       {$endregion}
 
